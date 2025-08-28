@@ -14,12 +14,20 @@ try {
     $lrn = $_POST['lrn'] ?? '';
     $first_name = $_POST['first_name'] ?? '';
     $last_name = $_POST['last_name'] ?? '';
+    $middle_name = $_POST['middle_name'] ?? '';
+    $gender = $_POST['gender'] ?? '';
     $email = $_POST['email'] ?? '';
     $class = $_POST['class'] ?? '';
     
     // Validate required fields
-    if (empty($lrn) || empty($first_name) || empty($last_name) || empty($email) || empty($class)) {
-        echo json_encode(['success' => false, 'message' => 'All fields are required']);
+    if (empty($lrn) || empty($first_name) || empty($last_name) || empty($gender) || empty($email) || empty($class)) {
+        echo json_encode(['success' => false, 'message' => 'All required fields must be filled']);
+        exit;
+    }
+    
+    // Validate gender
+    if (!in_array($gender, ['Male', 'Female'])) {
+        echo json_encode(['success' => false, 'message' => 'Please select a valid gender']);
         exit;
     }
     
@@ -45,13 +53,15 @@ try {
     $qr_data = $lrn . '|' . time();
     
     // Insert new student
-    $query = "INSERT INTO students (lrn, first_name, last_name, email, class, qr_code) 
-              VALUES (:lrn, :first_name, :last_name, :email, :class, :qr_code)";
+    $query = "INSERT INTO students (lrn, first_name, last_name, middle_name, gender, email, class, qr_code) 
+              VALUES (:lrn, :first_name, :last_name, :middle_name, :gender, :email, :class, :qr_code)";
     
     $stmt = $db->prepare($query);
     $stmt->bindParam(':lrn', $lrn);
     $stmt->bindParam(':first_name', $first_name);
     $stmt->bindParam(':last_name', $last_name);
+    $stmt->bindParam(':middle_name', $middle_name);
+    $stmt->bindParam(':gender', $gender);
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':class', $class);
     $stmt->bindParam(':qr_code', $qr_data);

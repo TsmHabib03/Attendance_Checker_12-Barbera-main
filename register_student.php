@@ -41,6 +41,21 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="middle_name">Middle Name:</label>
+                    <input type="text" id="middle_name" name="middle_name" class="form-control" 
+                           placeholder="Enter middle name (optional)">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender" class="form-control" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" class="form-control" required 
                            placeholder="student@school.com">

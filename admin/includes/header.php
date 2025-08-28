@@ -21,8 +21,8 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     <!-- Main CSS -->
     <link rel="stylesheet" href="../css/style.css">
     
-    <!-- Admin CSS -->
-    <link rel="stylesheet" href="../css/admin.css">
+    <!-- Admin CSS with cache busting -->
+    <link rel="stylesheet" href="../css/admin.css?v=<?php echo time(); ?>">
     
     <?php if (isset($additionalCSS)): ?>
         <?php foreach ($additionalCSS as $css): ?>

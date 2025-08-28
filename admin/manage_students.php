@@ -45,12 +45,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $lrn = trim($_POST['lrn'] ?? '');
         $firstName = trim($_POST['first_name'] ?? '');
         $lastName = trim($_POST['last_name'] ?? '');
+        $middleName = trim($_POST['middle_name'] ?? '');
+        $gender = trim($_POST['gender'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $class = trim($_POST['class'] ?? '');
         
         // Validation
-        if (empty($lrn) || empty($firstName) || empty($lastName) || empty($email) || empty($class)) {
-            $message = "All fields are required.";
+        if (empty($lrn) || empty($firstName) || empty($lastName) || empty($gender) || empty($email) || empty($class)) {
+            $message = "All required fields must be filled.";
+            $messageType = "error";
+        } elseif (!in_array($gender, ['Male', 'Female'])) {
+            $message = "Please select a valid gender.";
             $messageType = "error";
         } elseif (!preg_match('/^\d{11,13}$/', $lrn)) {
             $message = "LRN must be 11-13 digits only.";
@@ -70,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         // Insert new student
                         $stmt = $pdo->prepare("
-                            INSERT INTO students (lrn, first_name, last_name, email, class, created_at) 
-                            VALUES (?, ?, ?, ?, ?, NOW())
+                            INSERT INTO students (lrn, first_name, last_name, middle_name, gender, email, class, created_at) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                         ");
-                        $stmt->execute([$lrn, $firstName, $lastName, $email, $class]);
+                        $stmt->execute([$lrn, $firstName, $lastName, $middleName, $gender, $email, $class]);
                         
                         $message = "Student added successfully!";
                         $messageType = "success";
@@ -92,10 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Update student
                         $stmt = $pdo->prepare("
                             UPDATE students 
-                            SET lrn = ?, first_name = ?, last_name = ?, email = ?, class = ?, updated_at = NOW() 
+                            SET lrn = ?, first_name = ?, last_name = ?, middle_name = ?, gender = ?, email = ?, class = ?, updated_at = NOW() 
                             WHERE id = ?
                         ");
-                        $stmt->execute([$lrn, $firstName, $lastName, $email, $class, $editStudent['id']]);
+                        $stmt->execute([$lrn, $firstName, $lastName, $middleName, $gender, $email, $class, $editStudent['id']]);
                         
                         $message = "Student updated successfully!";
                         $messageType = "success";
@@ -224,6 +229,17 @@ include 'includes/header.php';
                     </div>
                     
                     <div class="form-group">
+                        <label for="middle_name">Middle Name</label>
+                        <input type="text" 
+                               id="middle_name" 
+                               name="middle_name" 
+                               class="form-control" 
+                               maxlength="50"
+                               placeholder="Enter middle name (optional)"
+                               value="<?php echo sanitizeOutput($editStudent['middle_name'] ?? ''); ?>">
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="last_name">Last Name *</label>
                         <input type="text" 
                                id="last_name" 
@@ -236,17 +252,32 @@ include 'includes/header.php';
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="email">Email Address *</label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           class="form-control" 
-                           required 
-                           maxlength="100"
-                           placeholder="Enter email address"
-                           value="<?php echo sanitizeOutput($editStudent['email'] ?? ''); ?>">
-                    <small class="form-help">Used for communication and notifications</small>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" 
+                                name="gender" 
+                                class="form-control" 
+                                required>
+                            <option value="">Select Gender</option>
+                            <option value="Male" <?php echo (($editStudent['gender'] ?? '') === 'Male') ? 'selected' : ''; ?>>Male</option>
+                            <option value="Female" <?php echo (($editStudent['gender'] ?? '') === 'Female') ? 'selected' : ''; ?>>Female</option>
+                        </select>
+                        <small class="form-help">Required for SF2 reporting</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               class="form-control" 
+                               required 
+                               maxlength="100"
+                               placeholder="Enter email address"
+                               value="<?php echo sanitizeOutput($editStudent['email'] ?? ''); ?>">
+                        <small class="form-help">Used for communication and notifications</small>
+                    </div>
                 </div>
                 
                 <div class="form-actions">

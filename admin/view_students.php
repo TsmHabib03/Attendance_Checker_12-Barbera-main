@@ -38,8 +38,8 @@ try {
     
     // Get students with optimized query
     $studentsSQL = "
-        SELECT id, lrn, first_name, last_name, email, class, created_at,
-               CONCAT(first_name, ' ', last_name) as full_name
+        SELECT id, lrn, first_name, last_name, middle_name, gender, email, class, created_at,
+               CONCAT(first_name, ' ', IFNULL(CONCAT(middle_name, ' '), ''), last_name) as full_name
         FROM students 
         $whereSQL 
         ORDER BY class ASC, last_name ASC, first_name ASC 
@@ -139,6 +139,7 @@ include 'includes/header.php';
                         <tr>
                             <th>LRN</th>
                             <th>Student</th>
+                            <th>Gender</th>
                             <th>Email</th>
                             <th>Class</th>
                             <th>QR Code</th>
@@ -161,6 +162,11 @@ include 'includes/header.php';
                                             <strong><?php echo sanitizeOutput($student['full_name']); ?></strong>
                                         </div>
                                     </div>
+                                </td>
+                                <td>
+                                    <span class="gender-badge <?php echo strtolower($student['gender'] ?? 'unknown'); ?>">
+                                        <?php echo sanitizeOutput($student['gender'] ?? 'Unknown'); ?>
+                                    </span>
                                 </td>
                                 <td>
                                     <span class="email-text"><?php echo sanitizeOutput($student['email']); ?></span>
